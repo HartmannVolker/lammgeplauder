@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import FileField from "../../components/forms/FileField";
 import TexField from "../../components/forms/TextField";
 import { Podcast } from "../../types/models";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "react-toastify";
 import uploadFile from "../../libs/db/uploadFile";
 import { ValidationError } from "../../libs/db/validation";
@@ -22,12 +22,19 @@ export default function AdminPage(){
   const {
     register,
     handleSubmit,
-    watch,
     setError,
     formState: { errors },
     control,
     reset,
   } = useForm<EditPodcast>();
+  const file = useWatch({
+    control,
+    name: "logo",
+  });
+  const color = useWatch({
+    control,
+    name: "homepageBackgroundColor",
+  });
   const fetchPodcast = useCallback(()=> fetch("/api/podcast", { method: "GET" })
   .then((res) => {
     if (res.ok) return res.json();
@@ -89,11 +96,9 @@ export default function AdminPage(){
     return "Image missing";
   }
 
-  const file = watch("logo");
 
   const previewUrl =
     file?.length > 0 ? URL.createObjectURL(file[0]) : podcast?.logoUrl;
-  const color = watch("homepageBackgroundColor");
     return <>
     {podcast && (
         <form
